@@ -1,0 +1,168 @@
+!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sustav za Praćenje Raspodjele Goriva | Checkpoint 1</title>
+    <!-- Učitavanje Tailwind CSS-a preko CDN-a za brzi i responsive dizajn -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Postavljanje 'Inter' fonta kao standardnog */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+        }
+        /* Prilagodba Flash poruka */
+        .alert-success { background-color: #d1fae5; border-color: #34d399; color: #065f46; }
+        .alert-error { background-color: #fee2e2; border-color: #f87171; color: #991b1b; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="mb-8 p-4 bg-white shadow-lg rounded-xl border-b-4 border-indigo-600">
+            <h1 class="text-3xl font-extrabold text-gray-900">
+                ⛽ Raspodjela Goriva
+            </h1>
+            <p class="text-gray-500 mt-1">
+                Monolitna aplikacija za praćenje distribucije goriva (Checkpoint 1, RS).
+            </p>
+        </header>
+
+        <!-- Prikaz poruke (uspjeh/greška) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="p-3 mb-4 rounded-lg border-l-4 font-medium 
+                    {% if category == 'success' or category == 'message' %}alert-success{% else %}alert-error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+        {% if message %}
+             <div class="p-3 mb-4 rounded-lg border-l-4 font-medium 
+                {% if message.type == 'success' %}alert-success{% else %}alert-error{% endif %}">
+                {{ message.text }}
+            </div>
+        {% endif %}
+
+        <!-- Sekcija za sažetak (Statistika) -->
+        <section class="mb-8 p-6 bg-white shadow-xl rounded-xl">
+            <h2 class="text-2xl font-semibold mb-4 text-indigo-700">Sažetak distribucije</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-indigo-50 rounded-lg text-center shadow-inner">
+                    <p class="text-xs font-medium text-gray-500">Ukupno zapisa</p>
+                    <p class="text-2xl font-bold text-indigo-900">{{ summary.total_records }}</p>
+                </div>
+                <div class="p-4 bg-indigo-50 rounded-lg text-center shadow-inner">
+                    <p class="text-xs font-medium text-gray-500">Ukupno distribuirano</p>
+                    <p class="text-2xl font-bold text-indigo-900">{{ summary.total_distributed_liters }}</p>
+                </div>
+                <div class="p-4 bg-indigo-50 rounded-lg text-center shadow-inner">
+                    <p class="text-xs font-medium text-gray-500">Zadnje ažuriranje</p>
+                    <p class="text-sm font-bold text-indigo-900 break-words">{{ summary.last_update[:16].replace('T', ' ') if summary.last_update != "Nema zapisa" else summary.last_update }}</p>
+                </div>
+            </div>
+            
+            <h3 class="text-xl font-medium mt-6 mb-2 text-gray-700">Količina po vrsti goriva:</h3>
+            <div class="flex flex-wrap gap-3">
+                {% for type, quantity in summary.quantity_by_type.items() %}
+                    <span class="px-3 py-1 bg-indigo-200 text-indigo-800 text-sm font-semibold rounded-full shadow-md">
+                        {{ type }}: {{ quantity }} ({{ summary.count_by_type[type] }}x)
+                    </span>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Sekcija za unos novog zapisa -->
+        <section class="mb-8 p-6 bg-white shadow-xl rounded-xl border-t-4 border-green-500">
+            <h2 class="text-2xl font-semibold mb-4 text-green-700">Dodaj novi zapis distribucije</h2>
+            <form method="POST" action="/" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Lokacija -->
+                    <div>
+                        <label for="location" class="block text-sm font-medium text-gray-700">Lokacija / Postaja</label>
+                        <input type="text" id="location" name="location" required 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
+                               placeholder="Npr. Postaja Split Istok">
+                    </div>
+                    
+                    <!-- Vrsta goriva -->
+                    <div>
+                        <label for="fuel_type" class="block text-sm font-medium text-gray-700">Vrsta goriva</label>
+                        <select id="fuel_type" name="fuel_type" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-white focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                            {% for type in fuel_types %}
+                                <option value="{{ type }}">{{ type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Količina -->
+                    <div>
+                        <label for="quantity_liters" class="block text-sm font-medium text-gray-700">Količina (L)</label>
+                        <input type="number" id="quantity_liters" name="quantity_liters" step="0.01" min="0.01" required 
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
+                               placeholder="Npr. 5000.50">
+                    </div>
+                </div>
+                
+                <button type="submit" 
+                        class="w-full md:w-auto px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition duration-150 transform hover:scale-[1.01]">
+                    Zabilježi distribuciju
+                </button>
+            </form>
+        </section>
+
+        <!-- Sekcija za tablicu zapisa -->
+        <section class="p-6 bg-white shadow-xl rounded-xl">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-700">Povijest zapisa ({{ records|length }} zapisa)</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokacija</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vrsta goriva</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Količina (L)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vrijeme (UTC)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcija</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for record in records %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ record.location }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {% if record.fuel_type == 'Benzin' %}bg-red-100 text-red-800
+                                        {% elif record.fuel_type == 'Dizel' %}bg-blue-100 text-blue-800
+                                        {% elif record.fuel_type == 'Autoplin' %}bg-purple-100 text-purple-800
+                                        {% else %}bg-green-100 text-green-800{% endif %}">
+                                        {{ record.fuel_type }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">{{ "{:,.2f}".format(record.quantity_liters) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ record.timestamp[:16].replace('T', ' ') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <form method="POST" action="{{ url_for('ui.delete_record_route', record_id=record.record_id) }}" onsubmit="return confirm('Jeste li sigurni da želite obrisati ovaj zapis?');">
+                                        <button type="submit" class="text-red-600 hover:text-red-900 text-xs font-medium p-1 rounded-md hover:bg-red-50 transition">Obriši</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500 italic">Nema zabilježenih zapisa distribucije. Dodajte prvi zapis gore!</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="mt-10 pt-4 border-t border-gray-200 text-center text-xs text-gray-500">
+            <p>Monolitna arhitektura (Self-contained) | Jezik: Python, Framework: Flask | Pohrana: Lokalni JSON file ({{ '/myapp/data/fuel_distribution_data.json' }})</p>
+        </footer>
+    </div>
+
+</body>
+</html>
