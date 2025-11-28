@@ -5,5 +5,68 @@
         "fuel_type": "Benzin",
         "quantity_liters": 200000.0,
         "timestamp": "2025-11-25T20:25:08.416033"
+    },
+    {
+        "record_id": "fd0ba59a-021d-4af7-8453-d748ecb9e3a3",
+        "location": "Zagreb ",
+        "fuel_type": "Električno",
+        "quantity_liters": 9903.0,
+        "timestamp": "2025-11-28T01:19:09.714791"
+    },
+    {
+        "record_id": "75f02d37-469f-4364-b9d7-adce7982b974",
+        "location": "444322",
+        "fuel_type": "Autoplin",
+        "quantity_liters": 223411.0,
+        "timestamp": "2025-11-28T01:19:57.761817"
+    },
+    {
+        "record_id": "688dd1ad-da6f-43c8-8de6-8a296ecd5971",
+        "location": "virovitica",
+        "fuel_type": "Dizel",
+        "quantity_liters": 2222.0,
+        "timestamp": "2025-11-28T01:42:23.840696"
+    },
+    {
+        "record_id": "541d875e-9f0d-46b4-bed5-489834022499",
+        "location": "virovitica",
+        "fuel_type": "Dizel",
+        "quantity_liters": 2222.0,
+        "timestamp": "2025-11-28T01:56:04.126977"
+    },
+    {
+        "record_id": "35362965-c3da-4727-a561-2a02aa960289",
+        "location": "virovitica",
+        "fuel_type": "Dizel",
+        "quantity_liters": 2222.0,
+        "timestamp": "2025-11-28T08:10:44.534182"
+    },
+    {
+        "record_id": "a9ea330d-37d4-4395-bd85-9b608713dff9",
+        "location": "virovitica",
+        "fuel_type": "Dizel",
+        "quantity_liters": 2222.0,
+        "timestamp": "2025-11-28T08:10:50.814603"
+    },
+    {
+        "record_id": "00543c7c-233e-414d-9b66-8a6452bf678f",
+        "location": "Vukovar",
+        "fuel_type": "Benzin",
+        "quantity_liters": 223344.0,
+        "timestamp": "2025-11-28T08:13:23.412994"
+    },
+    {
+        "record_id": "f2bd7114-ac54-4c43-877a-18811ba14e72",
+        "location": "Daruar",
+        "fuel_type": "Dizel",
+        "quantity_liters": 444.0,
+        "timestamp": "2025-11-28T08:13:43.716834"
+    },
+    {
+        "record_id": "a929181a-85f3-4d0f-bfc4-7bebde3735f1",
+        "location": "Daruar",
+        "fuel_type": "Dizel",
+        "quantity_liters": 444.0,
+        "timestamp": "2025-11-28T08:15:27.003706"
     }
 ]
